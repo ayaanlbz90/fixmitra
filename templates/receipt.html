@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - {{ booking.booking_code }} | FixMitra</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff; color: #1a1a1a; padding: 40px; }
+        .invoice-box { max-width: 800px; margin: auto; border: 1px solid #eee; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: bold; color: #0088cc; }
+        .table { width: 100%; margin-top: 30px; border-collapse: collapse; }
+        .table th, .table td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        .footer { margin-top: 40px; text-align: center; color: #777; font-size: 13px; border-top: 1px solid #eee; padding-top: 20px; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="max-width: 800px; margin: 0 auto 20px auto; text-align: right;">
+        <button onclick="window.print()" style="padding: 10px 20px; background: #0088cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Print Invoice / PDF 🖨️</button>
+    </div>
+
+    <div class="invoice-box">
+        <div class="header">
+            <div>
+                <div class="logo">🔧 FixMitra</div>
+                <p style="margin-top: 4px; font-size: 14px;"><em>Aapka Device, Hamari Zimmedari</em></p>
+                <p style="font-size: 12px; color: #555;">Founder: Ayaan Shaikh</p>
+            </div>
+            <div style="text-align: right;">
+                <h3 style="margin: 0; color: #333;">INVOICE</h3>
+                <p style="margin: 4px 0 0 0; color: #666;">Code: <strong>{{ booking.booking_code }}</strong></p>
+                <p style="margin: 2px 0 0 0; color: #666;">Date: {{ booking.created_at }}</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+            <div>
+                <strong>Billed To:</strong><br>
+                {{ booking.user_name }}<br>
+                Phone: {{ booking.phone }}<br>
+                City: {{ booking.city }}
+            </div>
+            <div style="text-align: right;">
+                <strong>Service Details:</strong><br>
+                Mode: {{ booking.service_mode }}<br>
+                Tech Provider: {{ booking.tech_name or 'FixMitra Partner' }}<br>
+                Warranty Cover: {{ booking.warranty_days or 90 }} Days
+            </div>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th>Item Description</th>
+                    <th>Device</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Repair & Diagnostics Service ({{ booking.problem }})</td>
+                    <td>{{ booking.brand }} {{ booking.device_type }}</td>
+                    <td>{{ booking.estimated_cost }}</td>
+                </tr>
+                <tr>
+                    <td>Safe Transit & Logistics Protection Fee</td>
+                    <td>Standard Delivery</td>
+                    <td>₹{{ booking.delivery_charge }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 20px; text-align: right;">
+            <p style="font-size: 16px;"><strong>Payment Status:</strong> <span style="color: green;">{{ booking.payment_status }}</span></p>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for choosing <strong>FixMitra</strong> for your hardware repair services!</p>
+            <p>For support queries, please reach out via our official WhatsApp service handle.</p>
+        </div>
+    </div>
+</body>
+</html>

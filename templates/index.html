@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <section class="hero">
+        <div>
+            <h1 class="hero-title">Broken Device?<br><span style="background: linear-gradient(135deg, #00d2ff, #7a5cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Aapka Device, Hamari Zimmedari.</span></h1>
+            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 24px;">Book verified repairs for mobiles, laptops, and PCs from your doorstep. Doorstep service in selected cities with safe device delivery protection.</p>
+            <div style="display: flex; gap: 16px;">
+                <a href="/wizard" class="btn btn-primary">Start Repair</a>
+                <a href="/track" class="btn btn-secondary">Track Repair</a>
+            </div>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <h3 style="margin-bottom: 12px;">Doorstep Availability Check</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Home visits exclusively available in supported metros:</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;">
+                {% for city in cities %}
+                    <span style="background: rgba(0,210,255,0.1); color: var(--accent-blue); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">{{ city }}</span>
+                {% endfor %}
+            </div>
+            <a href="/wizard" class="btn btn-primary" style="width: 100%;">Book Service ➔</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

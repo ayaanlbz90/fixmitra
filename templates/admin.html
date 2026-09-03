@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <h2 style="margin-bottom: 8px;">FixMitra Admin Panel</h2>
+    <p style="color: var(--text-muted); margin-bottom: 24px;">Manage service updates, update repair statuses, and oversee platform requests.</p>
+
+    <div class="card" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);">
+                    <th style="padding: 12px;">Booking Code</th>
+                    <th style="padding: 12px;">Customer</th>
+                    <th style="padding: 12px;">City</th>
+                    <th style="padding: 12px;">Device</th>
+                    <th style="padding: 12px;">Payment</th>
+                    <th style="padding: 12px;">Current Status</th>
+                    <th style="padding: 12px;">Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 12px; font-weight: bold; color: var(--accent-blue);">{{ b.booking_code }}</td>
+                    <td style="padding: 12px;">{{ b.user_name }}<br><small style="color: var(--text-muted);">{{ b.phone }}</small></td>
+                    <td style="padding: 12px;">{{ b.city }}</td>
+                    <td style="padding: 12px;">{{ b.brand }} {{ b.device_type }}</td>
+                    <td style="padding: 12px;"><span style="color: {% if b.payment_status == 'Paid' %}var(--success){% else %}var(--danger){% endif %};">{{ b.payment_status }}</span></td>
+                    <td style="padding: 12px;">{{ b.status }}</td>
+                    <td style="padding: 12px;">
+                        <form action="/admin" method="POST" style="display: flex; gap: 6px;">
+                            <input type="hidden" name="booking_id" value="{{ b.id }}">
+                            <select name="status" class="form-control" style="padding: 4px 8px; font-size: 0.8rem;">
+                                <option value="Booking Confirmed" {% if b.status == 'Booking Confirmed' %}selected{% endif %}>Booking Confirmed</option>
+                                <option value="Technician Dispatched" {% if b.status == 'Technician Dispatched' %}selected{% endif %}>Technician Dispatched</option>
+                                <option value="In Progress" {% if b.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if b.status == 'Completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button type="submit" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

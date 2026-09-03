@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <h2 style="margin-bottom: 8px;">My Repair Dashboard</h2>
+    <p style="color: var(--text-muted); margin-bottom: 24px;">Welcome back, {{ session.get('user_name') }}! Manage your active repairs and warranty records.</p>
+
+    {% if bookings %}
+    <div class="grid-2">
+        {% for b in bookings %}
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span style="font-weight: bold; color: var(--accent-blue);">{{ b.booking_code }}</span>
+                <span style="font-size: 0.8rem; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px;">{{ b.created_at }}</span>
+            </div>
+            <h3 style="margin-bottom: 6px;">{{ b.brand }} {{ b.device_type }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Issue: {{ b.problem }}</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Technician: {{ b.tech_name or 'Unassigned' }}</p>
+
+            <div style="margin: 16px 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">Status</span>
+                    <strong style="color: var(--accent-blue);">{{ b.status }}</strong>
+                </div>
+                <a href="/track?code={{ b.booking_code }}" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.85rem;">Details ➔</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 40px;">
+        <p style="color: var(--text-muted); margin-bottom: 16px;">You don't have any repair orders scheduled yet.</p>
+        <a href="/wizard" class="btn btn-primary">Book Your First Repair ➔</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

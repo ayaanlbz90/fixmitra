@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div class="card" style="max-width: 600px; margin: 0 auto 30px auto;">
+        <h2>Track Your Repair Status</h2>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">Enter your unique FixMitra booking code (e.g., FM-XXXXXX).</p>
+
+        <form action="/track" method="GET" style="display: flex; gap: 10px;">
+            <input type="text" name="code" class="form-control" placeholder="Enter Booking Code" value="{{ query_code or '' }}" required>
+            <button type="submit" class="btn btn-primary">Track</button>
+        </form>
+    </div>
+
+    {% if booking %}
+    <div class="card" style="max-width: 700px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 16px;">
+            <div>
+                <h3>Booking Code: <span style="color: var(--accent-blue);">{{ booking.booking_code }}</span></h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">City: {{ booking.city }} | Mode: {{ booking.service_mode }}</p>
+            </div>
+            <span style="background: rgba(0, 210, 255, 0.15); color: var(--accent-blue); padding: 6px 14px; border-radius: 20px; font-weight: bold;">
+                {{ booking.status }}
+            </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.9rem; margin-bottom: 20px;">
+            <div>
+                <p style="color: var(--text-muted);">Customer</p>
+                <p><strong>{{ booking.user_name }}</strong> ({{ booking.phone }})</p>
+            </div>
+            <div>
+                <p style="color: var(--text-muted);">Device Details</p>
+                <p><strong>{{ booking.brand }} {{ booking.device_type }}</strong> — {{ booking.problem }}</p>
+            </div>
+            <div>
+                <p style="color: var(--text-muted);">Assigned Technician</p>
+                <p><strong>{{ booking.tech_name or 'Pending Assignment' }}</strong></p>
+            </div>
+            <div>
+                <p style="color: var(--text-muted);">Payment Status</p>
+                <p><strong style="color: {% if booking.payment_status == 'Paid' %}var(--success){% else %}var(--danger){% endif %};">{{ booking.payment_status }}</strong></p>
+            </div>
+        </div>
+
+        <a href="/receipt/{{ booking.booking_code }}" target="_blank" class="btn btn-secondary" style="width: 100%; text-align: center;">View & Print Invoice / Receipt 📄</a>
+    </div>
+    {% elif query_code %}
+    <div class="alert-error" style="max-width: 600px; margin: 0 auto; text-align: center;">
+        No active repair found matching code <strong>{{ query_code }}</strong>.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

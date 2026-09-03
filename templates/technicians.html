@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <h2 style="margin-bottom: 8px;">Select a Verified Specialist</h2>
+    <p style="color: var(--text-muted); margin-bottom: 24px;">Choose from our top-rated local experts for your repair service.</p>
+
+    <div class="grid-2">
+        {% for tech in technicians %}
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <h3 style="color: #fff;">{{ tech.name }} {% if tech.verified %}<span style="color: var(--accent-blue); font-size: 0.9rem;">✔ Verified</span>{% endif %}</h3>
+                    <p style="color: var(--accent-purple); font-size: 0.85rem; font-weight: 600;">{{ tech.specialty }}</p>
+                </div>
+                <span style="background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
+                    ★ {{ tech.rating }}
+                </span>
+            </div>
+
+            <div style="display: flex; gap: 16px; margin: 16px 0; color: var(--text-muted); font-size: 0.85rem;">
+                <div><strong>Repairs:</strong> {{ tech.repairs_completed }}+</div>
+                <div><strong>Distance:</strong> {{ tech.distance_km }} km</div>
+                <div><strong>Warranty:</strong> {{ tech.warranty_days }} Days</div>
+            </div>
+
+            <form action="/book/{{ tech.id }}" method="GET">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Select Technician ➔</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

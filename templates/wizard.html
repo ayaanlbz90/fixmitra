@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div class="card" style="max-width: 700px; margin: 0 auto;">
+        <h2>Repair Configuration</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Configure device details and choose service parameters.</p>
+
+        {% if error %}
+            <div class="alert-error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/technicians" method="POST">
+            <div class="form-group">
+                <label>Select Your City</label>
+                <select name="city" class="form-control" required>
+                    {% for city in cities %}
+                        <option value="{{ city }}">{{ city }}</option>
+                    {% endfor %}
+                    <option value="Other">Other City</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Device Type</label>
+                <select id="wizard-device" name="device" class="form-control">
+                    <option value="Mobile">📱 Mobile Phone</option>
+                    <option value="Laptop">💻 Laptop</option>
+                    <option value="PC">🖥️ Desktop PC</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Brand</label>
+                <input type="text" name="brand" class="form-control" placeholder="e.g. Apple, Dell, Samsung" required>
+            </div>
+
+            <div class="form-group">
+                <label>Select Issue</label>
+                <select id="wizard-problem" name="problem" class="form-control">
+                    <option value="Screen Damage">Screen Damage</option>
+                    <option value="Battery Problem">Battery Problem</option>
+                    <option value="Charging Problem">Charging Problem</option>
+                    <option value="Software Issue">Software / OS Issue</option>
+                    <option value="SSD/RAM Upgrade">Hardware Upgrade</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Service Type</label>
+                <select name="service_mode" class="form-control">
+                    <option value="Home Repair">🏠 Home Repair (Only Selected Cities)</option>
+                    <option value="Pickup & Repair">📦 Pickup & Safe Delivery (Pan-India)</option>
+                </select>
+            </div>
+
+            <div class="card" style="background: rgba(0,210,255,0.05); margin: 20px 0;">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Estimated Repair Cost</p>
+                <h2 id="estimated-price-display" style="color: var(--accent-blue);">₹1,200 - ₹4,500</h2>
+                <input type="hidden" name="estimate" id="hidden-estimate" value="₹1,200 - ₹4,500">
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Includes +₹150 Safe Courier & Transport Handling Fee</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Find Available Technicians ➔</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

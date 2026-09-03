@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="padding: 60px 0;">
+    <div class="card" style="max-width: 450px; margin: 0 auto;">
+        <h2 style="margin-bottom: 8px;">Login to FixMitra</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Access your repairs, warranties, and status.</p>
+
+        {% if error %}
+            <div class="alert-error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" class="form-control" required placeholder="you@domain.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Login ➔</button>
+        </form>
+        <p style="margin-top: 16px; font-size: 0.9rem; text-align: center; color: var(--text-muted);">
+            Don't have an account? <a href="/register">Register here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
