@@ -2,27 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - FixMitra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Panel - FixMitra</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light py-4">
-<div class="container-fluid">
-    <h2 class="mb-4">Admin Control Panel</h2>
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>FixMitra Admin Control Panel</h2>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">Go to Homepage</a>
+    </div>
+
     <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h4 class="card-title mb-0">Manage Customer Bookings</h4>
+        </div>
         <div class="card-body">
-            <h4 class="card-title mb-3">Manage Orders</h4>
+            {% if bookings %}
             <div class="table-responsive">
                 <table class="table table-striped table-hover align-middle">
-                    <thead>
+                    <thead class="table-dark">
                         <tr>
-                            <th>Code</th>
+                            <th>Booking Code</th>
                             <th>Customer</th>
                             <th>Phone</th>
-                            <th>Device</th>
                             <th>City</th>
+                            <th>Device</th>
+                            <th>Issue</th>
                             <th>Repair Status</th>
                             <th>Payment Status</th>
                             <th>Action</th>
+                            <th>Receipt</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -31,8 +41,9 @@
                             <td><strong>{{ b.booking_code }}</strong></td>
                             <td>{{ b.user_name }}</td>
                             <td>{{ b.phone }}</td>
-                            <td>{{ b.brand }} {{ b.device_type }}</td>
                             <td>{{ b.city }}</td>
+                            <td>{{ b.brand }} {{ b.device_type }}</td>
+                            <td>{{ b.problem }}</td>
                             <form method="POST" action="{{ url_for('admin') }}">
                                 <input type="hidden" name="booking_id" value="{{ b.id }}">
                                 <td>
@@ -54,11 +65,17 @@
                                     <button type="submit" class="btn btn-sm btn-success">Update</button>
                                 </td>
                             </form>
+                            <td>
+                                <a href="{{ url_for('receipt', code=b.booking_code) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <p class="text-muted mb-0">No repair bookings recorded in the system yet.</p>
+            {% endif %}
         </div>
     </div>
 </div>

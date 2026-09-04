@@ -329,20 +329,19 @@ def track():
     return render_template('track.html', booking=booking, query_code=code)
 
 @app.route('/receipt/<code>')
-@login_required
 def receipt(code):
     conn = get_db()
     booking = conn.execute('''
         SELECT b.*, t.name as tech_name, t.warranty_days 
         FROM bookings b 
         LEFT JOIN technicians t ON b.technician_id = t.id 
-        WHERE b.booking_code = ? AND b.user_id = ?
-    ''', (code, session['user_id'])).fetchone()
+        WHERE b.booking_code = ?
+    ''', (code,)).fetchone()
     conn.close()
 
     if not booking:
-        flash("Receipt not found or permission denied.", "danger")
-        return redirect(url_for('dashboard'))
+        flash("Receipt not found.", "danger")
+        return redirect(url_for('home'))
 
     return render_template('receipt.html', booking=booking)
 
@@ -360,13 +359,9 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', bookings=bookings)
 
+# Direct Public Access - No Login Required
 @app.route('/admin', methods=['GET', 'POST'])
-@login_required
 def admin():
-    if session.get('user_role') != 'admin':
-        flash("Admin privileges required to access this portal.", "danger")
-        return redirect(url_for('dashboard'))
-
     conn = get_db()
     if request.method == 'POST':
         booking_id = request.form.get('booking_id')
@@ -384,33 +379,6 @@ def admin():
     techs = conn.execute('SELECT * FROM technicians').fetchall()
     conn.close()
     return render_template('admin.html', bookings=bookings, technicians=techs)
-
-@app.route('/receipt/<code>')
-@login_required
-def receipt(code):
-    conn = get_db()
-    # Allow admins to view any receipt, but restrict regular users to their own
-    if session.get('user_role') == 'admin':
-        booking = conn.execute('''
-            SELECT b.*, t.name as tech_name, t.warranty_days 
-            FROM bookings b 
-            LEFT JOIN technicians t ON b.technician_id = t.id 
-            WHERE b.booking_code = ?
-        ''', (code,)).fetchone()
-    else:
-        booking = conn.execute('''
-            SELECT b.*, t.name as tech_name, t.warranty_days 
-            FROM bookings b 
-            LEFT JOIN technicians t ON b.technician_id = t.id 
-            WHERE b.booking_code = ? AND b.user_id = ?
-        ''', (code, session['user_id'])).fetchone()
-    conn.close()
-
-    if not booking:
-        flash("Receipt not found or permission denied.", "danger")
-        return redirect(url_for('dashboard'))
-
-    return render_template('receipt.html', booking=booking)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
