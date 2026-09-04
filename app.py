@@ -385,5 +385,32 @@ def admin():
     conn.close()
     return render_template('admin.html', bookings=bookings, technicians=techs)
 
+@app.route('/receipt/<code>')
+@login_required
+def receipt(code):
+    conn = get_db()
+    # Allow admins to view any receipt, but restrict regular users to their own
+    if session.get('user_role') == 'admin':
+        booking = conn.execute('''
+            SELECT b.*, t.name as tech_name, t.warranty_days 
+            FROM bookings b 
+            LEFT JOIN technicians t ON b.technician_id = t.id 
+            WHERE b.booking_code = ?
+        ''', (code,)).fetchone()
+    else:
+        booking = conn.execute('''
+            SELECT b.*, t.name as tech_name, t.warranty_days 
+            FROM bookings b 
+            LEFT JOIN technicians t ON b.technician_id = t.id 
+            WHERE b.booking_code = ? AND b.user_id = ?
+        ''', (code, session['user_id'])).fetchone()
+    conn.close()
+
+    if not booking:
+        flash("Receipt not found or permission denied.", "danger")
+        return redirect(url_for('dashboard'))
+
+    return render_template('receipt.html', booking=booking)
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
