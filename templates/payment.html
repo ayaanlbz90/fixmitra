@@ -1,94 +1,48 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container" style="padding: 40px 0;">
-    <div class="card" style="max-width: 650px; margin: 0 auto;">
-        
-        {% if success %}
-        <div style="text-align: center; padding: 20px 0;">
-            <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
-            <h2 style="color: var(--success); margin-bottom: 8px;">Payment Successful!</h2>
-            <p style="color: var(--text-muted); margin-bottom: 24px;">Your repair request has been confirmed and locked into our queue.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment - FixMitra</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container py-5" style="max-width: 600px;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4 text-center">Complete Your Payment</h2>
             
-            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); border-radius: 10px; padding: 16px; margin-bottom: 24px;">
-                <p style="font-size: 0.9rem; color: var(--text-muted);">Your Unique Booking Code</p>
-                <h1 style="color: #fff; letter-spacing: 2px; margin-top: 4px;">{{ booking.booking_code }}</h1>
-            </div>
+            {% if success %}
+                <div class="alert alert-success">
+                    <h4 class="alert-heading">Choice Saved!</h4>
+                    <p>Booking Code: <strong>{{ booking.booking_code }}</strong></p>
+                    <p>Payment Status: <strong>{{ booking.payment_status }}</strong></p>
+                    <hr>
+                    <a href="{{ url_for('track', code=booking.booking_code) }}" class="btn btn-primary w-100">Track Order</a>
+                </div>
+            {% else %}
+                <p><strong>Booking Code:</strong> {{ booking.booking_code }}</p>
+                <p><strong>Estimated Cost:</strong> {{ booking.estimated_cost }}</p>
+                
+                <form method="POST">
+                    <div class="form-check mb-3 p-3 border rounded">
+                        <input class="form-check-input" type="radio" name="payment_method" id="pay_online" value="online" checked>
+                        <label class="form-check-label" for="pay_online">
+                            <strong>Pay Online Now</strong> (UPI, Credit/Debit Card, Net Banking)
+                        </label>
+                    </div>
 
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <a href="/track?code={{ booking.booking_code }}" class="btn btn-primary">Track Order ➔</a>
-                <a href="/receipt/{{ booking.booking_code }}" target="_blank" class="btn btn-secondary">View Invoice 📄</a>
-            </div>
+                    <div class="form-check mb-4 p-3 border rounded">
+                        <input class="form-check-input" type="radio" name="payment_method" id="pay_later" value="pay_later">
+                        <label class="form-check-label" for="pay_later">
+                            <strong>Pay After Service</strong> (Cash or UPI on completion)
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 btn-lg">Confirm Payment Choice</button>
+                </form>
+            {% endif %}
         </div>
-
-        {% else %}
-        <h2>FixMitra Checkout & Payment</h2>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">Confirm order details and complete payment to initiate service.</p>
-
-        <div style="background: rgba(255, 255, 255, 0.03); border-radius: 10px; padding: 20px; margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 12px;">
-                <span style="color: var(--text-muted);">Booking Code:</span>
-                <strong style="color: var(--accent-blue);">{{ booking.booking_code }}</strong>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="color: var(--text-muted);">Customer Name:</span>
-                <span>{{ booking.user_name }}</span>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="color: var(--text-muted);">Device Issue:</span>
-                <span>{{ booking.brand }} {{ booking.device_type }} ({{ booking.problem }})</span>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="color: var(--text-muted);">Service Mode:</span>
-                <span>{{ booking.service_mode }} ({{ booking.city }})</span>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="color: var(--text-muted);">Estimated Repair Fee:</span>
-                <span>{{ booking.estimated_cost }}</span>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <span style="color: var(--text-muted);">Safe Courier & Transit Fee:</span>
-                <span style="color: var(--accent-blue);">+ ₹{{ booking.delivery_charge }}</span>
-            </div>
-        </div>
-
-        <form action="/payment/{{ booking.booking_code }}" method="POST">
-            <h4 style="margin-bottom: 12px;">Select Payment Method</h4>
-
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
-                <label style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 8px; cursor: pointer;">
-                    <input type="radio" name="payment_method" value="UPI" checked style="accent-color: var(--accent-blue);">
-                    <div>
-                        <strong>UPI / QR Code</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Google Pay, PhonePe, Paytm, BHIM</p>
-                    </div>
-                </label>
-
-                <label style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 8px; cursor: pointer;">
-                    <input type="radio" name="payment_method" value="Card" style="accent-color: var(--accent-blue);">
-                    <div>
-                        <strong>Credit / Debit Card</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Visa, MasterCard, RuPay</p>
-                    </div>
-                </label>
-
-                <label style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 8px; cursor: pointer;">
-                    <input type="radio" name="payment_method" value="COD" style="accent-color: var(--accent-blue);">
-                    <div>
-                        <strong>Pay After Service (Cash / Online)</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Pay directly to technician after repair completion</p>
-                    </div>
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 14px;">Confirm & Pay Now ➔</button>
-        </form>
-        {% endif %}
-
     </div>
 </div>
-{% endblock %}
+</body>
+</html>
