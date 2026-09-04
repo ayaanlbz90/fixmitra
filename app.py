@@ -74,15 +74,13 @@ def init_db():
     ''')
 
     # Seed Initial Demo Technicians
-   def init_db():
+def init_db():
     conn = get_db()
     cursor = conn.cursor()
     
-    # Drop existing table so old data gets replaced with new list
-    cursor.execute("DROP TABLE IF EXISTS technicians")
-    
+    # Re-create table if columns don't match
     cursor.execute('''
-        CREATE TABLE technicians (
+        CREATE TABLE IF NOT EXISTS technicians (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             rating REAL,
@@ -94,13 +92,16 @@ def init_db():
         )
     ''')
 
+    # Clear old data so new values insert cleanly
+    cursor.execute("DELETE FROM technicians")
+
     demo_techs = [
         ("Milan Mobile", 4.9, 1420, 1.8, 90, "Mobile & accessories Expert", 1),
         ("Precision Micro-Fix Services", 4.8, 980, 2.4, 90, "PC & Laptop Specialist", 1),
         ("Gadget Guru", 4.7, 650, 3.1, 60, "Chip Level Repair", 1),
         ("Khadim Mobile", 4.6, 1120, 4.0, 30, "Screen & Battery Fast Service", 1)
     ]
-    
+
     cursor.executemany('''
         INSERT INTO technicians (name, rating, repairs_completed, distance_km, warranty_days, specialty, verified)
         VALUES (?, ?, ?, ?, ?, ?, ?)
