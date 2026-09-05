@@ -12,13 +12,15 @@
     <nav class="navbar">
         <div class="container nav-container">
             <a href="/" class="logo">🔧 FixMitra</a>
+			
             <ul class="nav-links">
+			<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('about') }}">About Us</a>
+</li>
                 <li><a href="/">Home</a></li>
                 <li><a href="/wizard">Repair Wizard</a></li>
                 <li><a href="/track">Track Repair</a></li>
-				<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('about') }}">About Us</a>
-</li>
+				
 <li class="nav-item">
     <a class="nav-link text-warning fw-bold" href="{{ url_for('second_hand_phones') }}">Buy Refurbished Phones</a>
 </li>
