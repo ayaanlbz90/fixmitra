@@ -8,9 +8,13 @@ from flask import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from datetime import timedelta
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "fixmitra_secure_key_production")
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max limit
+
+# Set session lifespan to exactly 24 hours
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
 DB_PATH = 'database.db'
 ALLOWED_CITIES = ["Ahmedabad", "Kapadvanj", "Nadiad", "Mahudha", "Kathlal", "Anand"]
@@ -169,6 +173,9 @@ def login():
         conn.close()
 
         if user and check_password_hash(user['password'], password):
+            # Enable 24-hour persistent session
+            session.permanent = True
+            
             session['user_id'] = user['id']
             session['user_name'] = user['name']
             session['user_email'] = user['email']
