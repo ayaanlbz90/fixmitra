@@ -295,12 +295,8 @@ def payment(code):
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        payment_method = request.form.get('payment_method')
-        
-        if payment_method == 'pay_later':
-            new_payment_status = 'Unpaid (Pay After Service)'
-        else:
-            new_payment_status = 'Paid'
+        # Update payment status to indicate price confirmation is pending service completion
+        new_payment_status = 'Pending (Final Cost Provided After Service)'
 
         conn.execute('UPDATE bookings SET payment_status = ? WHERE booking_code = ?', 
                      (new_payment_status, code))
