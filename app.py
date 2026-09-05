@@ -379,6 +379,14 @@ def admin():
     techs = conn.execute('SELECT * FROM technicians').fetchall()
     conn.close()
     return render_template('admin.html', bookings=bookings, technicians=techs)
+    
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/second-hand-phones')
+def second_hand_phones():
+    return render_template('shop.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

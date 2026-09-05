@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - FixMitra</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="{{ url_for('home') }}">FixMitra</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+            <a class="nav-link active" href="/about">About Us</a>
+            <a class="nav-link text-warning fw-bold" href="/second-hand-phones">Buy Refurbished Phones</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <!-- Introduction & Story -->
+    <div class="card shadow-sm p-4 mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold text-primary mb-3">Welcome to FixMitra</h1>
+                <p class="lead">Hi, I'm <strong>Shaikh Ayan Aasifbhai</strong>, founder of FixMitra.</p>
+                <p>We started FixMitra with a simple goal: to remove the headache, delays, and unfair pricing from everyday gadget repairs and second-hand tech buying.</p>
+                <p>Finding trustworthy local technicians or getting reliable second-hand phones with actual warranties used to be stressful. FixMitra bridges that gap by offering verified doorstep repair services, transparent estimates, and pre-tested quality certified refurbished smartphones.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-primary text-white rounded p-4 shadow-sm">
+                    <h3 class="fw-bold">Our Mission</h3>
+                    <p class="mb-0">Fast, affordable, and honest gadget repairs & verified tech brought directly to your doorstep.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- What We Solve -->
+    <h3 class="fw-bold mb-3 text-center">What We Solve</h3>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 p-3 shadow-sm text-center">
+                <h5 class="fw-bold text-primary">Overpriced Repairs</h5>
+                <p class="text-muted">We provide clear, upfront cost estimates before any work begins—no surprise fees.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-3 shadow-sm text-center">
+                <h5 class="fw-bold text-primary">Unreliable Quality</h5>
+                <p class="text-muted">Every technician and second-hand phone in our network goes through strict quality and performance testing.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-3 shadow-sm text-center">
+                <h5 class="fw-bold text-primary">Inconvenience</h5>
+                <p class="text-muted">Doorstep pickup, tracking, and direct customer support mean you never have to waste time waiting at a repair shop.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Care -->
+    <div class="card bg-dark text-white p-4 text-center shadow-sm">
+        <h4 class="fw-bold">Need Help? Contact Customer Support</h4>
+        <p class="text-light mb-3">Have questions about a repair, an order, or need a custom quote? Reach out to us directly!</p>
+        <div>
+            <a href="https://wa.me/919558533117?text=Hello%20FixMitra%20Support,%20I%20have%20a%20query." target="_blank" class="btn btn-success btn-lg me-2">
+                💬 Chat on WhatsApp
+            </a>
+            <a href="tel:9558533117" class="btn btn-outline-light btn-lg">📞 Call Us</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
