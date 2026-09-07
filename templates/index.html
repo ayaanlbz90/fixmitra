@@ -1,26 +1,215 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <div class="container">
     <section class="hero">
         <div>
-            <h1 class="hero-title">Broken Device?<br><span style="background: linear-gradient(135deg, #00d2ff, #7a5cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Aapka Device, Hamari Zimmedari.</span></h1>
-            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 24px;">Book verified repairs for mobiles, laptops, and PCs from your doorstep. Doorstep service in selected cities with safe device delivery protection.</p>
-            <div style="display: flex; gap: 16px;">
-                <a href="/wizard" class="btn btn-primary">Start Repair</a>
-                <a href="/track" class="btn btn-secondary">Track Repair</a>
+            <span class="eyebrow">⚡ On-demand device repair</span>
+            <h1 class="hero-title">Broken device?<br><span class="accent-text">Aapka Device, Hamari Zimmedari.</span></h1>
+            <p class="hero-sub">Book verified repairs for mobiles, laptops, and PCs from your doorstep — transparent pricing, background-checked technicians, and safe pickup insurance in every city we serve.</p>
+            <div class="flex-wrap-gap">
+                <a href="/wizard" class="btn btn-primary">Start a Repair →</a>
+                <a href="/track" class="btn btn-secondary">Track My Repair</a>
+            </div>
+
+            <div class="hero-stats">
+                <div>
+                    <div class="hero-stat-num">4,000+</div>
+                    <div class="hero-stat-label">Repairs completed</div>
+                </div>
+                <div>
+                    <div class="hero-stat-num">4.8★</div>
+                    <div class="hero-stat-label">Average rating</div>
+                </div>
+                <div>
+                    <div class="hero-stat-num">6</div>
+                    <div class="hero-stat-label">Cities served</div>
+                </div>
+                <div>
+                    <div class="hero-stat-num">90 days</div>
+                    <div class="hero-stat-label">Warranty on repairs</div>
+                </div>
             </div>
         </div>
-        
-        <div class="card" style="text-align: center;">
-            <h3 style="margin-bottom: 12px;">Doorstep Availability Check</h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Home visits exclusively available in supported metros:</p>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;">
+
+        <div class="hero-visual-card">
+            <h3 style="color: #fff; margin-bottom: 6px;">Doorstep availability</h3>
+            <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 20px;">Home visits available in these supported cities:</p>
+            <div class="flex-wrap-gap" style="margin-bottom: 24px;">
                 {% for city in cities %}
-                    <span style="background: rgba(0,210,255,0.1); color: var(--accent-blue); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">{{ city }}</span>
+                    <span class="city-chip">{{ city }}</span>
                 {% endfor %}
             </div>
-            <a href="/wizard" class="btn btn-primary" style="width: 100%;">Book Service ➔</a>
+            <p style="color: rgba(255,255,255,0.8); font-size: 0.85rem; margin-bottom: 16px;">Outside these cities? Choose Pickup & Repair — available pan-India.</p>
+            <a href="/wizard" class="btn btn-accent btn-block">Check My City →</a>
         </div>
     </section>
 </div>
+
+<!-- Trust bar -->
+<div class="section-alt section-tight">
+    <div class="container">
+        <div class="grid-4">
+            <div class="text-center">
+                <div style="font-size: 1.6rem;">✅</div>
+                <p style="font-weight: 700; color: var(--text-primary); margin-top: 6px;">Verified Technicians</p>
+            </div>
+            <div class="text-center">
+                <div style="font-size: 1.6rem;">💰</div>
+                <p style="font-weight: 700; color: var(--text-primary); margin-top: 6px;">Upfront Estimates</p>
+            </div>
+            <div class="text-center">
+                <div style="font-size: 1.6rem;">🛡️</div>
+                <p style="font-weight: 700; color: var(--text-primary); margin-top: 6px;">Safe Transit Cover</p>
+            </div>
+            <div class="text-center">
+                <div style="font-size: 1.6rem;">🏆</div>
+                <p style="font-weight: 700; color: var(--text-primary); margin-top: 6px;">90-Day Warranty</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How it works -->
+<div class="section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">How it works</span>
+            <h2>Repairs made simple, in 4 steps</h2>
+            <p>From diagnosis to doorstep delivery — we handle the entire journey so you don't have to chase repair shops.</p>
+        </div>
+        <div class="grid-4">
+            <div class="card card-flat">
+                <div class="step-num">1</div>
+                <h3>Tell us the issue</h3>
+                <p>Pick your device, brand, and problem — get an instant price estimate.</p>
+            </div>
+            <div class="card card-flat">
+                <div class="step-num">2</div>
+                <h3>Choose a technician</h3>
+                <p>Compare verified specialists by rating, warranty, and distance.</p>
+            </div>
+            <div class="card card-flat">
+                <div class="step-num">3</div>
+                <h3>Book your slot</h3>
+                <p>Select home repair or safe pickup & delivery — whatever suits you.</p>
+            </div>
+            <div class="card card-flat">
+                <div class="step-num">4</div>
+                <h3>Track & pay after service</h3>
+                <p>No upfront payment. Track live status and pay once the job's done.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Services -->
+<div class="section section-alt">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">What we fix</span>
+            <h2>One platform for every device</h2>
+        </div>
+        <div class="grid-3">
+            <div class="card">
+                <div class="icon-tile">📱</div>
+                <h3>Mobile Repair</h3>
+                <p>Screen, battery, charging port & software issues — fixed fast for every major brand.</p>
+            </div>
+            <div class="card">
+                <div class="icon-tile teal">💻</div>
+                <h3>Laptop Repair</h3>
+                <p>Screen replacement, battery swaps, RAM/SSD upgrades, and overheating fixes.</p>
+            </div>
+            <div class="card">
+                <div class="icon-tile amber">🖥️</div>
+                <h3>PC & Desktop</h3>
+                <p>Windows troubleshooting, hardware diagnostics, upgrades, and data recovery.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonials -->
+<div class="section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">Trusted by customers</span>
+            <h2>What people are saying</h2>
+        </div>
+        <div class="grid-3">
+            <div class="card testimonial-card">
+                <span class="star-rating">★★★★★</span>
+                <p class="testimonial-quote">"Screen replaced at home in under an hour. Pricing was exactly what the app quoted — no surprise charges."</p>
+                <div class="testimonial-person">
+                    <div class="avatar-circle">RP</div>
+                    <div><strong>Riya Patel</strong><br><span class="text-muted" style="font-size:0.82rem;">Ahmedabad</span></div>
+                </div>
+            </div>
+            <div class="card testimonial-card">
+                <span class="star-rating">★★★★★</span>
+                <p class="testimonial-quote">"Sent my laptop for pickup repair, tracked every stage online, and it came back working like new."</p>
+                <div class="testimonial-person">
+                    <div class="avatar-circle">MK</div>
+                    <div><strong>Manav Kapoor</strong><br><span class="text-muted" style="font-size:0.82rem;">Nadiad</span></div>
+                </div>
+            </div>
+            <div class="card testimonial-card">
+                <span class="star-rating">★★★★☆</span>
+                <p class="testimonial-quote">"Booked a PC diagnosis, got a fair estimate upfront, and the 90-day warranty gave real peace of mind."</p>
+                <div class="testimonial-person">
+                    <div class="avatar-circle">SD</div>
+                    <div><strong>Sanya Desai</strong><br><span class="text-muted" style="font-size:0.82rem;">Anand</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ -->
+<div class="section section-alt">
+    <div class="container max-w-md">
+        <div class="section-heading">
+            <span class="eyebrow">FAQ</span>
+            <h2>Common questions</h2>
+        </div>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question">Do I have to pay before the repair starts? <span class="faq-icon">+</span></div>
+                <div class="faq-answer">No. FixMitra bookings are pay-after-service — the final cost is confirmed only after diagnosis and the repair is complete.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Is home repair available everywhere? <span class="faq-icon">+</span></div>
+                <div class="faq-answer">Home visits currently cover select cities. Outside those areas, choose Pickup & Repair — available pan-India with safe transit cover.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">What warranty do I get? <span class="faq-icon">+</span></div>
+                <div class="faq-answer">Every repair comes with a technician-backed warranty of up to 90 days, shown on your booking and receipt.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">How do I track my repair? <span class="faq-icon">+</span></div>
+                <div class="faq-answer">Use the Track Repair page with your booking code (e.g. FM-123456) to see live status and technician assignment.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="section">
+    <div class="container">
+        <div class="cta-banner">
+            <h2>Ready to get your device fixed?</h2>
+            <p>Get an instant estimate and book a verified technician in under two minutes.</p>
+            <a href="/wizard" class="btn btn-accent">Start Your Repair →</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('.faq-question').forEach(q => {
+    q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+});
+</script>
 {% endblock %}

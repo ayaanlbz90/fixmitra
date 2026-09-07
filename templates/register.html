@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
+{% block title %}Create Account — FixMitra{% endblock %}
 {% block content %}
-<div class="container" style="padding: 60px 0;">
-    <div class="card" style="max-width: 450px; margin: 0 auto;">
-        <h2 style="margin-bottom: 8px;">Create Account</h2>
-        <p style="color: var(--text-muted); margin-bottom: 20px;">Register to configure repairs and request doorstep visits.</p>
+<div class="container" style="padding: 72px 0;">
+    <div class="card max-w-sm">
+        <h2 class="mb-8">Create Account</h2>
+        <p class="text-muted mb-24">Register to configure repairs and request doorstep visits.</p>
 
         {% if error %}
-            <div class="alert-error">{{ error }}</div>
+            <div class="alert-error">⚠️ {{ error }}</div>
         {% endif %}
 
         <form action="/register" method="POST">
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" name="name" class="form-control" required placeholder="Fist-Name Last-Name">
+                <input type="text" name="name" class="form-control" required placeholder="First Last">
             </div>
             <div class="form-group">
                 <label>Phone Number</label>
@@ -26,8 +27,11 @@
                 <label>Password</label>
                 <input type="password" name="password" class="form-control" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Register ➔</button>
+            <button type="submit" class="btn btn-primary btn-block">Register →</button>
         </form>
+        <p class="text-center text-muted mt-16" style="font-size:0.9rem;">
+            Already have an account? <a href="/login">Login here</a>
+        </p>
     </div>
 </div>
 {% endblock %}

@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
+{% block title %}Repair Wizard — FixMitra{% endblock %}
 {% block content %}
-<div class="container" style="padding: 40px 0;">
-    <div class="card" style="max-width: 700px; margin: 0 auto;">
+<div class="container" style="padding: 56px 0;">
+    <div class="card max-w-md">
+        <span class="eyebrow">Step 1 of 3</span>
+        <div class="wizard-progress">
+            <div class="wizard-progress-step done"></div>
+            <div class="wizard-progress-step"></div>
+            <div class="wizard-progress-step"></div>
+        </div>
         <h2>Repair Configuration</h2>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">Configure device details and choose service parameters.</p>
+        <p class="text-muted mb-24">Tell us about your device and we'll match you with the right technician.</p>
 
         {% if error %}
-            <div class="alert-error">{{ error }}</div>
+            <div class="alert-error">⚠️ {{ error }}</div>
         {% endif %}
 
         <form action="/technicians" method="POST">
@@ -46,21 +53,26 @@
             </div>
 
             <div class="form-group">
+                <label>Anything else we should know? (optional)</label>
+                <textarea name="description" class="form-control" placeholder="Describe the issue in more detail..."></textarea>
+            </div>
+
+            <div class="form-group">
                 <label>Service Type</label>
                 <select name="service_mode" class="form-control">
-                    <option value="Home Repair">🏠 Home Repair (Only Selected Cities)</option>
+                    <option value="Home Repair">🏠 Home Repair (Selected cities only)</option>
                     <option value="Pickup & Repair">📦 Pickup & Safe Delivery (Pan-India)</option>
                 </select>
             </div>
 
-            <div class="card" style="background: rgba(0,210,255,0.05); margin: 20px 0;">
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Estimated Repair Cost</p>
-                <h2 id="estimated-price-display" style="color: var(--accent-blue);">₹1,200 - ₹4,500</h2>
+            <div class="estimate-box">
+                <p class="text-muted" style="font-size:0.85rem;">Estimated Repair Cost</p>
+                <h2 id="estimated-price-display">₹1,200 - ₹4,500</h2>
                 <input type="hidden" name="estimate" id="hidden-estimate" value="₹1,200 - ₹4,500">
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Includes +₹150 Safe Courier & Transport Handling Fee</p>
+                <p class="text-muted" style="font-size:0.78rem; margin-top:4px;">Includes +₹150 safe courier & transport handling fee</p>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Find Available Technicians ➔</button>
+            <button type="submit" class="btn btn-primary btn-block">Find Available Technicians →</button>
         </form>
     </div>
 </div>

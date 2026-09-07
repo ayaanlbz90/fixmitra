@@ -1,17 +1,20 @@
 {% extends 'base.html' %}
+{% block title %}Confirm Booking — FixMitra{% endblock %}
 {% block content %}
-<div class="container" style="padding: 40px 0;">
-    <div class="card" style="max-width: 600px; margin: 0 auto;">
-        <h2>Booking & Safe Transit Summary</h2>
-        
-        <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Technician:</strong> {{ tech.name }}</p>
-            <p><strong>Device:</strong> {{ info.brand }} {{ info.device }}</p>
-            <p><strong>Problem:</strong> {{ info.problem }}</p>
-            <p><strong>City:</strong> {{ info.city }}</p>
-            <p><strong>Service Mode:</strong> {{ info.service_mode }}</p>
-            <p><strong>Estimated Cost:</strong> {{ info.estimate }}</p>
-            <p style="color: var(--accent-blue);"><strong>Safe Transit & Insurance Charge:</strong> ₹{{ info.delivery_charge }}</p>
+<div class="container" style="padding: 48px 0;">
+    <span class="eyebrow">Step 3 of 3</span>
+    <div class="card max-w-md">
+        <h2 class="mb-8">Booking & Safe Transit Summary</h2>
+        <p class="text-muted mb-24">Review the details below, then confirm your booking.</p>
+
+        <div style="background: var(--surface-alt); padding: 18px; border-radius: var(--radius-md); margin-bottom: 24px; border: 1px solid var(--border);">
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Technician</span><strong>{{ tech.name }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Device</span><strong>{{ info.brand }} {{ info.device }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Problem</span><strong>{{ info.problem }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">City</span><strong>{{ info.city }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Service Mode</span><strong>{{ info.service_mode }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Estimated Cost</span><strong style="color: var(--primary);">{{ info.estimate }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Safe Transit Charge</span><strong>₹{{ info.delivery_charge }}</strong></div>
         </div>
 
         <form action="/book/{{ tech.id }}" method="POST">
@@ -23,7 +26,7 @@
                 <label>Contact Phone</label>
                 <input type="tel" name="phone" class="form-control" required placeholder="+91 **********">
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Proceed to Payment</button>
+            <button type="submit" class="btn btn-primary btn-block">Proceed to Confirmation →</button>
         </form>
     </div>
 </div>

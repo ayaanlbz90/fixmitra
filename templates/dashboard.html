@@ -1,35 +1,62 @@
 {% extends 'base.html' %}
+{% block title %}My Dashboard — FixMitra{% endblock %}
 {% block content %}
-<div class="container" style="padding: 40px 0;">
-    <h2 style="margin-bottom: 8px;">My Repair Dashboard</h2>
-    <p style="color: var(--text-muted); margin-bottom: 24px;">Welcome back, {{ session.get('user_name') }}! Manage your active repairs and warranty records.</p>
+<div class="container" style="padding: 48px 0;">
+    <h2 class="mb-8">My Repair Dashboard</h2>
+    <p class="text-muted mb-24">Welcome back, {{ session.get('user_name') }}! Manage your active repairs and warranty records.</p>
+
+    <div class="grid-4 mb-32">
+        <div class="stat-tile"><div class="stat-num">{{ stats.total }}</div><div class="stat-label">Total Bookings</div></div>
+        <div class="stat-tile"><div class="stat-num">{{ stats.in_progress }}</div><div class="stat-label">Active Repairs</div></div>
+        <div class="stat-tile"><div class="stat-num">{{ stats.completed }}</div><div class="stat-label">Completed</div></div>
+        <div class="stat-tile"><div class="stat-num">{{ stats.reviews_pending }}</div><div class="stat-label">Reviews Pending</div></div>
+    </div>
 
     {% if bookings %}
     <div class="grid-2">
         {% for b in bookings %}
         <div class="card">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <span style="font-weight: bold; color: var(--accent-blue);">{{ b.booking_code }}</span>
-                <span style="font-size: 0.8rem; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px;">{{ b.created_at }}</span>
+            <div class="row-between mb-12">
+                <span style="font-weight: 800; color: var(--primary);">{{ b.booking_code }}</span>
+                <span class="badge badge-neutral">{{ b.created_at }}</span>
             </div>
-            <h3 style="margin-bottom: 6px;">{{ b.brand }} {{ b.device_type }}</h3>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Issue: {{ b.problem }}</p>
-            <p style="color: var(--text-muted); font-size: 0.85rem;">Technician: {{ b.tech_name or 'Unassigned' }}</p>
+            <h3 class="mb-8">{{ b.brand }} {{ b.device_type }}</h3>
+            <p class="text-muted" style="font-size:0.88rem;">Issue: {{ b.problem }}</p>
+            <p class="text-muted" style="font-size:0.88rem;">Technician: {{ b.tech_name or 'Unassigned' }}</p>
 
-            <div style="margin: 16px 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="row-between mt-16" style="border-top: 1px solid var(--border); padding-top: 12px;">
                 <div>
-                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">Status</span>
-                    <strong style="color: var(--accent-blue);">{{ b.status }}</strong>
+                    <span class="text-muted" style="font-size:0.75rem; display:block;">Status</span>
+                    <strong style="color: var(--primary);">{{ b.status }}</strong>
                 </div>
-                <a href="/track?code={{ b.booking_code }}" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.85rem;">Details ➔</a>
+                <a href="/track?code={{ b.booking_code }}" class="btn btn-secondary btn-sm">Details →</a>
             </div>
+
+            {% if b.status == 'Completed' %}
+                {% if b.has_review %}
+                <div class="alert-success mt-16" style="margin-bottom:0;"><span>✓ You reviewed this repair — thanks!</span></div>
+                {% else %}
+                <form method="POST" action="{{ url_for('submit_review', code=b.booking_code) }}" class="mt-16" style="border-top: 1px solid var(--border); padding-top: 14px;">
+                    <label style="font-size:0.85rem; font-weight:700; margin-bottom:8px; display:block;">Rate this repair</label>
+                    <div class="star-input mb-12">
+                        <input type="radio" id="{{ b.booking_code }}-5" name="rating" value="5" required><label for="{{ b.booking_code }}-5">★</label>
+                        <input type="radio" id="{{ b.booking_code }}-4" name="rating" value="4"><label for="{{ b.booking_code }}-4">★</label>
+                        <input type="radio" id="{{ b.booking_code }}-3" name="rating" value="3"><label for="{{ b.booking_code }}-3">★</label>
+                        <input type="radio" id="{{ b.booking_code }}-2" name="rating" value="2"><label for="{{ b.booking_code }}-2">★</label>
+                        <input type="radio" id="{{ b.booking_code }}-1" name="rating" value="1"><label for="{{ b.booking_code }}-1">★</label>
+                    </div>
+                    <textarea name="comment" class="form-control mb-12" placeholder="How was the repair experience? (optional)"></textarea>
+                    <button type="submit" class="btn btn-primary btn-sm btn-block">Submit Review</button>
+                </form>
+                {% endif %}
+            {% endif %}
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="card" style="text-align: center; padding: 40px;">
-        <p style="color: var(--text-muted); margin-bottom: 16px;">You don't have any repair orders scheduled yet.</p>
-        <a href="/wizard" class="btn btn-primary">Book Your First Repair ➔</a>
+    <div class="card text-center" style="padding: 48px;">
+        <p class="text-muted mb-16">You don't have any repair orders scheduled yet.</p>
+        <a href="/wizard" class="btn btn-primary">Book Your First Repair →</a>
     </div>
     {% endif %}
 </div>

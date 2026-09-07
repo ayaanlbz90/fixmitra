@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
+{% block title %}Login — FixMitra{% endblock %}
 {% block content %}
-<div class="container" style="padding: 60px 0;">
-    <div class="card" style="max-width: 450px; margin: 0 auto;">
-        <h2 style="margin-bottom: 8px;">Login to FixMitra</h2>
-        <p style="color: var(--text-muted); margin-bottom: 20px;">Access your repairs, warranties, and status.</p>
+<div class="container" style="padding: 72px 0;">
+    <div class="card max-w-sm">
+        <h2 class="mb-8">Login to FixMitra</h2>
+        <p class="text-muted mb-24">Access your repairs, warranties, and status.</p>
 
         {% if error %}
-            <div class="alert-error">{{ error }}</div>
+            <div class="alert-error">⚠️ {{ error }}</div>
         {% endif %}
 
         <form action="/login" method="POST">
@@ -18,9 +19,9 @@
                 <label>Password</label>
                 <input type="password" name="password" class="form-control" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Login ➔</button>
+            <button type="submit" class="btn btn-primary btn-block">Login →</button>
         </form>
-        <p style="margin-top: 16px; font-size: 0.9rem; text-align: center; color: var(--text-muted);">
+        <p class="text-center text-muted mt-16" style="font-size:0.9rem;">
             Don't have an account? <a href="/register">Register here</a>
         </p>
     </div>

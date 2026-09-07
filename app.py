@@ -1,19 +1,19 @@
 import os
+import secrets
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 from flask import (
-    Flask, render_template, request, redirect, 
+    Flask, render_template, request, redirect,
     url_for, session, jsonify, flash
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from datetime import timedelta
-
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "fixmitra_secure_key_production")
+# Falls back to a random key per process start if SECRET_KEY isn't set in the
+# environment. Set SECRET_KEY in production so sessions survive restarts.
+app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
-# Set session lifespan to exactly 24 hours
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
 DB_PATH = 'database.db'
@@ -40,18 +40,39 @@ PRICE_DATABASE = {
     }
 }
 
+REFURBISHED_PHONES = [
+    {
+        'name': 'iPhone 12 (128GB)',
+        'condition': 'Condition: Superb (Minor scratches, 88% Battery Health)',
+        'features': ['Original OLED Display', 'FaceID & TrueTone Working', '90 Days Warranty'],
+        'price': 28500
+    },
+    {
+        'name': 'Samsung Galaxy S21 FE 5G',
+        'condition': 'Condition: Like New (8GB RAM / 128GB Storage)',
+        'features': ['120Hz AMOLED Screen', 'Original Charger Included', '90 Days Warranty'],
+        'price': 21000
+    },
+    {
+        'name': 'OnePlus Nord CE 3 Lite',
+        'condition': 'Condition: Excellent (8GB RAM / 128GB Storage)',
+        'features': ['108 MP Camera', '67W Fast Charger Included', '60 Days Warranty'],
+        'price': 13500
+    }
+]
+
 # --- DATABASE HELPERS ---
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA foreign_keys = ON')
     return conn
 
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
-    
-    # Create Users Table
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,8 +83,7 @@ def init_db():
             role TEXT DEFAULT 'customer'
         )
     ''')
-    
-    # Create Technicians Table
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS technicians (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,7 +97,6 @@ def init_db():
         )
     ''')
 
-    # Create Bookings Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS bookings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,11 +121,26 @@ def init_db():
         )
     ''')
 
-    # Seed Default Technicians if table is empty
+    # Reviews left by customers on completed bookings
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            booking_id INTEGER NOT NULL,
+            technician_id INTEGER,
+            user_id INTEGER,
+            rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+            comment TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (booking_id) REFERENCES bookings (id),
+            FOREIGN KEY (technician_id) REFERENCES technicians (id),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
     cursor.execute("SELECT COUNT(*) FROM technicians")
     if cursor.fetchone()[0] == 0:
         demo_techs = [
-            ("Milan Mobile", 4.9, 1420, 1.8, 90, "Mobile & accessories Expert", 1),
+            ("Milan Mobile", 4.9, 1420, 1.8, 90, "Mobile & Accessories Expert", 1),
             ("Precision Micro-Fix Services", 4.8, 980, 2.4, 90, "PC & Laptop Specialist", 1),
             ("Gadget Guru", 4.7, 650, 3.1, 60, "Chip Level Repair", 1),
             ("Khadim Mobile", 4.6, 1120, 4.0, 30, "Screen & Battery Fast Service", 1)
@@ -119,10 +153,13 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize DB structure on startup
 init_db()
 
-# --- AUTH DECORATOR ---
+@app.context_processor
+def inject_globals():
+    return {'current_year': datetime.now().year}
+
+# --- AUTH DECORATORS ---
 
 def login_required(f):
     @wraps(f)
@@ -130,6 +167,18 @@ def login_required(f):
         if 'user_id' not in session:
             flash("Please log in to access this page.", "warning")
             return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash("Please log in to access this page.", "warning")
+            return redirect(url_for('login', next=request.url))
+        if session.get('user_role') != 'admin':
+            flash("You don't have permission to view that page.", "danger")
+            return redirect(url_for('home'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -173,14 +222,12 @@ def login():
         conn.close()
 
         if user and check_password_hash(user['password'], password):
-            # Enable 24-hour persistent session
             session.permanent = True
-            
             session['user_id'] = user['id']
             session['user_name'] = user['name']
             session['user_email'] = user['email']
             session['user_role'] = user['role']
-            
+
             next_page = request.args.get('next')
             return redirect(next_page or url_for('dashboard'))
         else:
@@ -216,14 +263,13 @@ def estimate_price():
 @login_required
 def technicians():
     conn = get_db()
-    techs = conn.execute('SELECT * FROM technicians').fetchall()
-    conn.close()
 
     if request.method == 'POST':
         city = request.form.get('city')
         service_mode = request.form.get('service_mode')
 
         if service_mode == 'Home Repair' and city not in ALLOWED_CITIES:
+            conn.close()
             return render_template('wizard.html', cities=ALLOWED_CITIES,
                                    error=f"Home Repair service is currently unavailable in {city}. Please choose Pickup & Repair or select a supported city.")
 
@@ -237,7 +283,24 @@ def technicians():
             'delivery_charge': 150,
             'estimate': request.form.get('estimate', '₹1,000 - ₹3,000')
         }
-    return render_template('technicians.html', technicians=techs)
+
+    techs_raw = conn.execute('SELECT * FROM technicians').fetchall()
+    techs = []
+    specialties = set()
+    for t in techs_raw:
+        t = dict(t)
+        review_row = conn.execute(
+            'SELECT COUNT(*) as cnt, AVG(rating) as avg_rating FROM reviews WHERE technician_id = ?',
+            (t['id'],)
+        ).fetchone()
+        t['review_count'] = review_row['cnt'] or 0
+        if review_row['avg_rating']:
+            t['rating'] = round(review_row['avg_rating'], 1)
+        specialties.add(t['specialty'])
+        techs.append(t)
+    conn.close()
+
+    return render_template('technicians.html', technicians=techs, specialties=sorted(specialties))
 
 @app.route('/book/<int:tech_id>', methods=['GET', 'POST'])
 @login_required
@@ -261,8 +324,8 @@ def book(tech_id):
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO bookings (
-                booking_code, user_id, user_name, phone, city, 
-                device_type, brand, problem, description, service_mode, 
+                booking_code, user_id, user_name, phone, city,
+                device_type, brand, problem, description, service_mode,
                 delivery_charge, estimated_cost, technician_id, payment_status
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -293,7 +356,7 @@ def book(tech_id):
 @login_required
 def payment(code):
     conn = get_db()
-    booking = conn.execute('SELECT * FROM bookings WHERE booking_code = ? AND user_id = ?', 
+    booking = conn.execute('SELECT * FROM bookings WHERE booking_code = ? AND user_id = ?',
                            (code, session['user_id'])).fetchone()
 
     if not booking:
@@ -302,15 +365,12 @@ def payment(code):
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        # Update payment status to indicate price confirmation is pending service completion
         new_payment_status = 'Pending (Final Cost Provided After Service)'
-
-        conn.execute('UPDATE bookings SET payment_status = ? WHERE booking_code = ?', 
+        conn.execute('UPDATE bookings SET payment_status = ? WHERE booking_code = ?',
                      (new_payment_status, code))
         conn.commit()
         booking = conn.execute('SELECT * FROM bookings WHERE booking_code = ?', (code,)).fetchone()
         conn.close()
-        
         return render_template('payment.html', booking=booking, success=True)
 
     conn.close()
@@ -323,9 +383,9 @@ def track():
     if code:
         conn = get_db()
         booking = conn.execute('''
-            SELECT b.*, t.name as tech_name, t.warranty_days 
-            FROM bookings b 
-            LEFT JOIN technicians t ON b.technician_id = t.id 
+            SELECT b.*, t.name as tech_name, t.warranty_days
+            FROM bookings b
+            LEFT JOIN technicians t ON b.technician_id = t.id
             WHERE b.booking_code = ?
         ''', (code,)).fetchone()
         conn.close()
@@ -335,9 +395,9 @@ def track():
 def receipt(code):
     conn = get_db()
     booking = conn.execute('''
-        SELECT b.*, t.name as tech_name, t.warranty_days 
-        FROM bookings b 
-        LEFT JOIN technicians t ON b.technician_id = t.id 
+        SELECT b.*, t.name as tech_name, t.warranty_days
+        FROM bookings b
+        LEFT JOIN technicians t ON b.technician_id = t.id
         WHERE b.booking_code = ?
     ''', (code,)).fetchone()
     conn.close()
@@ -352,44 +412,122 @@ def receipt(code):
 @login_required
 def dashboard():
     conn = get_db()
-    bookings = conn.execute('''
-        SELECT b.*, t.name as tech_name 
-        FROM bookings b 
-        LEFT JOIN technicians t ON b.technician_id = t.id 
+    bookings_raw = conn.execute('''
+        SELECT b.*, t.name as tech_name
+        FROM bookings b
+        LEFT JOIN technicians t ON b.technician_id = t.id
         WHERE b.user_id = ?
         ORDER BY b.id DESC
     ''', (session['user_id'],)).fetchall()
-    conn.close()
-    return render_template('dashboard.html', bookings=bookings)
 
-# Direct Public Access - No Login Required
+    bookings = []
+    stats = {'total': 0, 'in_progress': 0, 'completed': 0, 'reviews_pending': 0}
+    for b in bookings_raw:
+        b = dict(b)
+        stats['total'] += 1
+        if b['status'] == 'Completed':
+            stats['completed'] += 1
+            review = conn.execute('SELECT id FROM reviews WHERE booking_id = ?', (b['id'],)).fetchone()
+            b['has_review'] = review is not None
+            if not b['has_review']:
+                stats['reviews_pending'] += 1
+        elif b['status'] in ('Booking Confirmed', 'Technician Assigned', 'In Progress'):
+            stats['in_progress'] += 1
+        bookings.append(b)
+    conn.close()
+
+    return render_template('dashboard.html', bookings=bookings, stats=stats)
+
+@app.route('/review/<code>', methods=['POST'])
+@login_required
+def submit_review(code):
+    rating = request.form.get('rating')
+    comment = request.form.get('comment', '').strip()
+
+    conn = get_db()
+    booking = conn.execute(
+        'SELECT * FROM bookings WHERE booking_code = ? AND user_id = ?',
+        (code, session['user_id'])
+    ).fetchone()
+
+    if not booking:
+        conn.close()
+        flash("Booking not found.", "danger")
+        return redirect(url_for('dashboard'))
+
+    if booking['status'] != 'Completed':
+        conn.close()
+        flash("You can only review completed repairs.", "warning")
+        return redirect(url_for('dashboard'))
+
+    existing = conn.execute('SELECT id FROM reviews WHERE booking_id = ?', (booking['id'],)).fetchone()
+    if existing:
+        conn.close()
+        flash("You've already reviewed this repair.", "info")
+        return redirect(url_for('dashboard'))
+
+    try:
+        rating_val = int(rating)
+        if rating_val < 1 or rating_val > 5:
+            raise ValueError
+    except (TypeError, ValueError):
+        conn.close()
+        flash("Please select a valid rating.", "warning")
+        return redirect(url_for('dashboard'))
+
+    conn.execute('''
+        INSERT INTO reviews (booking_id, technician_id, user_id, rating, comment)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (booking['id'], booking['technician_id'], session['user_id'], rating_val, comment))
+    conn.commit()
+    conn.close()
+
+    flash("Thanks for your feedback!", "success")
+    return redirect(url_for('dashboard'))
+
 @app.route('/admin', methods=['GET', 'POST'])
+@admin_required
 def admin():
     conn = get_db()
     if request.method == 'POST':
         booking_id = request.form.get('booking_id')
         new_status = request.form.get('status')
         new_payment_status = request.form.get('payment_status')
-        
+
         conn.execute('''
-            UPDATE bookings 
-            SET status = ?, payment_status = ? 
+            UPDATE bookings
+            SET status = ?, payment_status = ?
             WHERE id = ?
         ''', (new_status, new_payment_status, booking_id))
         conn.commit()
 
     bookings = conn.execute('SELECT * FROM bookings ORDER BY id DESC').fetchall()
-    techs = conn.execute('SELECT * FROM technicians').fetchall()
+    techs_raw = conn.execute('SELECT * FROM technicians').fetchall()
+
+    techs = []
+    for t in techs_raw:
+        t = dict(t)
+        cnt = conn.execute('SELECT COUNT(*) as cnt FROM reviews WHERE technician_id = ?', (t['id'],)).fetchone()
+        t['review_count'] = cnt['cnt']
+        techs.append(t)
+
+    stats = {
+        'total': len(bookings),
+        'in_progress': sum(1 for b in bookings if b['status'] in ('Booking Confirmed', 'Technician Assigned', 'In Progress')),
+        'completed': sum(1 for b in bookings if b['status'] == 'Completed'),
+        'unpaid': sum(1 for b in bookings if 'Unpaid' in b['payment_status'])
+    }
+
     conn.close()
-    return render_template('admin.html', bookings=bookings, technicians=techs)
-    
+    return render_template('admin.html', bookings=bookings, technicians=techs, stats=stats)
+
 @app.route('/about')
 def about():
     return render_template('about.html')
 
 @app.route('/second-hand-phones')
 def second_hand_phones():
-    return render_template('shop.html')
+    return render_template('shop.html', phones=REFURBISHED_PHONES)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

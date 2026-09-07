@@ -1,45 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Track Order - FixMitra</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
-<div class="container py-5" style="max-width: 700px;">
-    <h2 class="mb-4 text-center">Track Repair Order</h2>
-    
-    <form method="GET" action="{{ url_for('track') }}" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="code" class="form-control" placeholder="Enter Booking Code (e.g. FM-123456)" value="{{ query_code or '' }}" required>
-            <button class="btn btn-primary" type="submit">Search</button>
+{% extends 'base.html' %}
+{% block title %}Track Repair — FixMitra{% endblock %}
+{% block content %}
+<div class="container" style="padding: 56px 0;">
+    <div class="max-w-md">
+        <div class="text-center mb-24">
+            <h2>Track Your Repair</h2>
+            <p class="text-muted">Enter your booking code to see live status.</p>
         </div>
-    </form>
 
-    {% if booking %}
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Booking #{{ booking.booking_code }}</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>Customer Name:</strong> {{ booking.user_name }}</p>
-            <p><strong>Device:</strong> {{ booking.brand }} {{ booking.device_type }}</p>
-            <p><strong>Issue:</strong> {{ booking.problem }}</p>
-            <p><strong>Technician:</strong> {{ booking.tech_name or 'Assigned Soon' }}</p>
-            <p><strong>Repair Status:</strong> <span class="badge bg-info text-dark">{{ booking.status }}</span></p>
-            <p><strong>Payment Status:</strong> 
+        <form method="GET" action="{{ url_for('track') }}" class="mb-32">
+            <div style="display:flex; gap: 10px;">
+                <input type="text" name="code" class="form-control" placeholder="Enter Booking Code (e.g. FM-123456)" value="{{ query_code or '' }}" required>
+                <button class="btn btn-primary" type="submit" style="flex-shrink:0;">Search</button>
+            </div>
+        </form>
+
+        {% if booking %}
+        <div class="card">
+            <div class="row-between mb-16">
+                <h3>Booking #{{ booking.booking_code }}</h3>
+                <span class="badge badge-info">{{ booking.status }}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Customer</span><strong>{{ booking.user_name }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Device</span><strong>{{ booking.brand }} {{ booking.device_type }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Issue</span><strong>{{ booking.problem }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Technician</span><strong>{{ booking.tech_name or 'Assigned soon' }}</strong></div>
+            <div class="row-between" style="padding: 6px 0;">
+                <span class="text-muted">Payment Status</span>
                 {% if booking.payment_status == 'Paid' %}
-                    <span class="badge bg-success">Paid</span>
+                    <span class="badge badge-verified">Paid</span>
                 {% else %}
-                    <span class="badge bg-warning text-dark">{{ booking.payment_status }}</span>
+                    <span class="badge badge-warning">{{ booking.payment_status }}</span>
                 {% endif %}
-            </p>
-            <p><strong>Estimated Cost:</strong> {{ booking.estimated_cost }}</p>
+            </div>
+            <div class="row-between" style="padding: 6px 0;"><span class="text-muted">Estimated Cost</span><strong style="color: var(--primary);">{{ booking.estimated_cost }}</strong></div>
+            <div class="divider"></div>
+            <a href="{{ url_for('receipt', code=booking.booking_code) }}" class="btn btn-secondary btn-block">View Receipt</a>
         </div>
+        {% elif query_code %}
+        <div class="alert-error text-center" style="justify-content:center;">No order found with code "{{ query_code }}"</div>
+        {% endif %}
     </div>
-    {% elif query_code %}
-    <div class="alert alert-danger text-center">No order found with code "{{ query_code }}"</div>
-    {% endif %}
 </div>
-</body>
-</html>
+{% endblock %}

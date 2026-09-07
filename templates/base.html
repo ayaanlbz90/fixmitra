@@ -3,132 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FixMitra — Aapka Device, Hamari Zimmedari</title>
+    <title>{% block title %}FixMitra — Trusted Doorstep Device Repair{% endblock %}</title>
+    <meta name="description" content="FixMitra is India's growing on-demand repair marketplace for mobiles, laptops and PCs — verified technicians, transparent pricing, doorstep pickup.">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        /* Mobile-Only Hamburger Toggle Button */
-        .mobile-hamburger-btn {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 28px;
-            height: 22px;
-            z-index: 1001;
-        }
-
-        .mobile-hamburger-btn span {
-            width: 100%;
-            height: 3px;
-            background-color: #1e293b;
-            border-radius: 2px;
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Responsive Breakpoint: Strictly Mobile (< 768px) */
-        @media screen and (max-width: 768px) {
-            .mobile-hamburger-btn {
-                display: flex !important;
-            }
-
-            .nav-links {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background-color: #ffffff;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                padding: 1rem 1.5rem;
-                gap: 0.75rem;
-                border-bottom: 1px solid #e2e8f0;
-                z-index: 1000;
-            }
-
-            .nav-links.active {
-                display: flex !important;
-            }
-
-            .nav-links li {
-                width: 100%;
-            }
-
-            .nav-links a {
-                display: block;
-                padding: 8px 0;
-                width: 100%;
-            }
-        }
-    </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔧</text></svg>">
 </head>
 <body>
 
-    <nav class="navbar" style="position: relative;">
-        <div class="container nav-container" style="display: flex; justify-content: space-between; align-items: center;">
-            <a href="/" class="logo" style="font-weight: 800; text-decoration: none; font-size: 1.25rem;">🔧 FixMitra</a>
-            
-            <!-- 3-Line Hamburger Icon (Shows ON MOBILE ONLY) -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="logo">
+                <span class="logo-mark">🔧</span> FixMitra
+            </a>
+
             <button class="mobile-hamburger-btn" id="menuToggle" aria-label="Toggle navigation">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
 
-            <!-- Navigation Links -->
             <ul class="nav-links" id="navMenu">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('about') }}">About Us</a>
-                </li>
-                <li><a href="/">Home</a></li>
-                <li><a href="/wizard">Repair Wizard</a></li>
-                <li><a href="/track">Track Repair</a></li>
-                <li class="nav-item">
-                    <a class="nav-link text-warning fw-bold" href="{{ url_for('second_hand_phones') }}">Buy Refurbished Phones</a>
-                </li>
+                <li><a href="/" {% if request.path == '/' %}aria-current="page"{% endif %}>Home</a></li>
+                <li><a href="/wizard" {% if request.path == '/wizard' %}aria-current="page"{% endif %}>Repair Wizard</a></li>
+                <li><a href="/track" {% if request.path == '/track' %}aria-current="page"{% endif %}>Track Repair</a></li>
+                <li><a href="{{ url_for('about') }}" {% if request.path == '/about' %}aria-current="page"{% endif %}>About</a></li>
+                <li><a href="{{ url_for('second_hand_phones') }}" class="nav-cta-highlight">Refurbished Phones</a></li>
                 {% if session.get('user_id') %}
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="/logout" class="btn btn-secondary" style="padding: 6px 16px;">Logout</a></li>
+                    <li><a href="/dashboard" {% if request.path == '/dashboard' %}aria-current="page"{% endif %}>Dashboard</a></li>
+                    {% if session.get('user_role') == 'admin' %}
+                    <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                    {% endif %}
+                    <li><a href="/logout" class="btn btn-secondary btn-sm">Logout</a></li>
                 {% else %}
                     <li><a href="/login">Login</a></li>
-                    <li><a href="/register" class="btn btn-primary" style="padding: 6px 16px;">Register</a></li>
+                    <li><a href="/register" class="btn btn-primary btn-sm">Get Started</a></li>
                 {% endif %}
             </ul>
         </div>
     </nav>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container" style="padding-top: 20px;">
+          {% for category, message in messages %}
+            <div class="alert-box alert-{{ 'error' if category in ['danger','warning'] else category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <main style="flex: 1;">
         {% block content %}{% endblock %}
     </main>
 
-    <a href="https://api.whatsapp.com/send?phone=919558533117&text=Hello%20FixMitra,%20I%20have%20a%20query%20regarding%20my%20device%20repair." 
+    <a href="https://api.whatsapp.com/send?phone=919558533117&text=Hello%20FixMitra,%20I%20have%20a%20query%20regarding%20my%20device%20repair."
        target="_blank" class="whatsapp-float">
-        💬 Query via WhatsApp
+        💬 Chat with us
     </a>
 
     <footer>
-        <div class="container" style="text-align: center;">
-            <p><strong>FixMitra</strong> — <em>Aapka Device, Hamari Zimmedari</em></p>
-            <p style="font-size: 0.85rem; margin-top: 8px;">Founded by <strong>Ayaan Shaikh</strong>. Making device repair trusted & transparent.</p>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand"><span class="logo-mark">🔧</span> FixMitra</div>
+                    <p style="font-size: 0.9rem; color: var(--ink-400); max-width: 280px;">Aapka Device, Hamari Zimmedari. Verified doorstep repair for mobiles, laptops & PCs — with transparent pricing and warranty on every job.</p>
+                </div>
+                <div>
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="/wizard">Book a Repair</a></li>
+                        <li><a href="{{ url_for('second_hand_phones') }}">Refurbished Phones</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="/track">Track Repair</a></li>
+                        <li><a href="https://wa.me/919558533117" target="_blank">WhatsApp Support</a></li>
+                        <li><a href="tel:9558533117">Call Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Service Cities</h4>
+                    <ul class="footer-links">
+                        <li>Ahmedabad · Nadiad</li>
+                        <li>Kapadvanj · Anand</li>
+                        <li>Mahudha · Kathlal</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© {{ current_year }} FixMitra. Founded by Ayaan Shaikh.</span>
+                <span>Made with care for growing device repair needs.</span>
+            </div>
         </div>
     </footer>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        // Toggle mobile dropdown menu
         const menuToggle = document.getElementById('menuToggle');
         const navMenu = document.getElementById('navMenu');
-
         if (menuToggle && navMenu) {
-            menuToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-            });
+            menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
         }
     </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

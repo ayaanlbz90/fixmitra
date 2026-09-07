@@ -1,33 +1,63 @@
 {% extends 'base.html' %}
+{% block title %}Choose a Technician — FixMitra{% endblock %}
 {% block content %}
-<div class="container" style="padding: 40px 0;">
-    <h2 style="margin-bottom: 8px;">Select a Verified Specialist</h2>
-    <p style="color: var(--text-muted); margin-bottom: 24px;">Choose from our top-rated local experts for your repair service.</p>
+<div class="container" style="padding: 48px 0;">
+    <span class="eyebrow">Step 2 of 3</span>
+    <div class="wizard-progress max-w-md" style="margin-left:0;">
+        <div class="wizard-progress-step done"></div>
+        <div class="wizard-progress-step done"></div>
+        <div class="wizard-progress-step"></div>
+    </div>
+    <h2 class="mb-8">Select a Verified Specialist</h2>
+    <p class="text-muted mb-24">Choose from our top-rated local experts for your repair service.</p>
 
-    <div class="grid-2">
+    <div class="filter-bar" id="specialtyFilters">
+        <button class="filter-chip active" data-filter="all">All Specialties</button>
+        {% for s in specialties %}
+        <button class="filter-chip" data-filter="{{ s }}">{{ s }}</button>
+        {% endfor %}
+    </div>
+
+    <div class="grid-2" id="techGrid">
         {% for tech in technicians %}
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div class="card tech-card" data-specialty="{{ tech.specialty }}">
+            <div class="row-between" style="align-items: flex-start; margin-bottom: 12px;">
                 <div>
-                    <h3 style="color: #fff;">{{ tech.name }} {% if tech.verified %}<span style="color: var(--accent-blue); font-size: 0.9rem;">✔ Verified</span>{% endif %}</h3>
-                    <p style="color: var(--accent-purple); font-size: 0.85rem; font-weight: 600;">{{ tech.specialty }}</p>
+                    <h3>{{ tech.name }} {% if tech.verified %}<span class="badge badge-verified">✔ Verified</span>{% endif %}</h3>
+                    <p style="color: var(--primary); font-size: 0.85rem; font-weight: 700; margin-top: 4px;">{{ tech.specialty }}</p>
                 </div>
-                <span style="background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
-                    ★ {{ tech.rating }}
-                </span>
+                <span class="badge badge-rating">★ {{ tech.rating }}</span>
             </div>
 
-            <div style="display: flex; gap: 16px; margin: 16px 0; color: var(--text-muted); font-size: 0.85rem;">
-                <div><strong>Repairs:</strong> {{ tech.repairs_completed }}+</div>
-                <div><strong>Distance:</strong> {{ tech.distance_km }} km</div>
-                <div><strong>Warranty:</strong> {{ tech.warranty_days }} Days</div>
+            {% if tech.review_count and tech.review_count > 0 %}
+            <p class="text-muted" style="font-size:0.8rem; margin-bottom: 12px;">{{ tech.review_count }} customer review{{ 's' if tech.review_count != 1 else '' }}</p>
+            {% endif %}
+
+            <div class="flex-wrap-gap" style="margin: 12px 0; color: var(--text-muted); font-size: 0.85rem;">
+                <span><strong style="color: var(--text-primary);">{{ tech.repairs_completed }}+</strong> repairs</span>
+                <span>·</span>
+                <span><strong style="color: var(--text-primary);">{{ tech.distance_km }} km</strong> away</span>
+                <span>·</span>
+                <span><strong style="color: var(--text-primary);">{{ tech.warranty_days }} days</strong> warranty</span>
             </div>
 
-            <form action="/book/{{ tech.id }}" method="GET">
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Select Technician ➔</button>
-            </form>
+            <a href="/book/{{ tech.id }}" class="btn btn-primary btn-block">Select Technician →</a>
         </div>
         {% endfor %}
     </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('#specialtyFilters .filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        document.querySelectorAll('#specialtyFilters .filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const filter = chip.dataset.filter;
+        document.querySelectorAll('.tech-card').forEach(card => {
+            card.style.display = (filter === 'all' || card.dataset.specialty === filter) ? '' : 'none';
+        });
+    });
+});
+</script>
 {% endblock %}

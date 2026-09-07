@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             priceDisplay.innerText = data.estimate;
-            
+
             const hiddenEstimateInput = document.getElementById('hidden-estimate');
-            if(hiddenEstimateInput) hiddenEstimateInput.value = data.estimate;
+            if (hiddenEstimateInput) hiddenEstimateInput.value = data.estimate;
         } catch (err) {
             console.error("Error fetching estimation:", err);
         }
@@ -29,4 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
         deviceSelect.addEventListener('change', fetchEstimate);
         problemSelect.addEventListener('change', fetchEstimate);
     }
+
+    // Auto-dismiss flash messages after a few seconds
+    document.querySelectorAll('.alert-box').forEach(el => {
+        setTimeout(() => { el.style.transition = 'opacity 400ms ease'; el.style.opacity = '0'; }, 5000);
+    });
 });
